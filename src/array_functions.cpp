@@ -183,8 +183,8 @@ void sortArray(constants::sortOrder so) {
 
 		case sortOrder::ASCENDING: {
 
-			for (int i = 0 ; i < arr - 1 ; i++) {
-				for (int j = 0 ; j < arr - i - 1 ; j++) {
+			for (int i = 0 ; i < arr - 1; i++) {
+				for (int j = 0 ; j < arr - i - 1; j++) {
 					std::string temp1 = words[j].word;
 					std::string temp2 = words[j + 1].word;
 					toUpper(temp1);
