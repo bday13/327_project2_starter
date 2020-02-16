@@ -22,7 +22,7 @@ struct word {
 	int num_occur;
 };
 
-struct word words[constants::MAX_WORDS];
+word words[constants::MAX_WORDS];
 
 int arr = 0;
 //============================================================================
@@ -36,22 +36,40 @@ void extractTokensFromLine(std::string &myString) {
 	}
 }
 
+/**
+ * zero out array that tracks words and their occurrences
+ */
 void clearArray() {
 	arr = 0;
 }
 
+/**
+ * how many unique words are in array
+ */
 int getArraySize() {
 	return arr;
 }
 
+/**
+ * get data at a particular location
+ */
 std::string getArrayWordAt(int i) {
 	return words[i].word;
 }
 
+/**
+ * get data at a particular location
+ */
 int getArrayWord_NumbOccur_At(int i) {
 	return words[i].num_occur;
 }
 
+/**
+ * loop through whole file, one line at a time
+ * call processLine on each line
+ * returns false: myfstream is not open
+ *         true: otherwise
+ */
 bool processFile(std::fstream &myfstream) {
 	if (myfstream.is_open()) {
 		std::string line;
@@ -65,6 +83,10 @@ bool processFile(std::fstream &myfstream) {
 	return false;
 }
 
+/**
+ * take 1 line and extract all the tokens from it
+ * feed each token to processToken for recording
+ */
 void processLine(std::string &myString) {
 	std::stringstream ss(myString);
 	std::string token;
@@ -74,6 +96,9 @@ void processLine(std::string &myString) {
 	}
 }
 
+/**
+ * Keep track of how many times each token seen
+ */
 void processToken(std::string &token) {
 	strip_unwanted_chars(token);
 
@@ -100,6 +125,10 @@ void processToken(std::string &token) {
 	arr++;
 }
 
+/**
+ * if you are debugging the file must be in the project parent directory
+ * in this case Project2 with the .project and .cProject files
+ */
 bool openFile(std::fstream& myfile, const std::string& myFileName,
 				std::ios_base::openmode mode) {
 
@@ -110,12 +139,21 @@ bool openFile(std::fstream& myfile, const std::string& myFileName,
 	return false;
 }
 
+/**
+ * iff myfile is open then close it
+ */
 void closeFile(std::fstream& myfile) {
 
 	if (myfile.is_open())
 		myfile.close();
-};
+}
 
+/**
+ * serializes all content in myEntryArray to file outputfilename
+ * returns  FAIL_FILE_DID_NOT_OPEN if cannot open outputfilename
+ * 			FAIL_NO_ARRAY_DATA if there are 0 entries in myEntryArray
+ * 			SUCCESS if all data is written and outputfilename closes OK
+ */
 int writeArraytoFile(const std::string &outputfilename) {
 
 	std::ofstream outfile;
@@ -135,16 +173,23 @@ int writeArraytoFile(const std::string &outputfilename) {
 	return constants::SUCCESS;
 }
 
+/**
+ * Sort myEntryArray based on so enum value.
+ * The presence of the enum implies a switch statement
+ */
 void sortArray(constants::sortOrder so) {
 
 	switch(so) {
-		case sortOrder::ASCENDING:
+
+		case sortOrder::ASCENDING: {
+
 			for (int i = 0 ; i < arr - 1 ; i++) {
 				for (int j = 0 ; j < arr - i - 1 ; j++) {
 					std::string temp1 = words[j].word;
 					std::string temp2 = words[j + 1].word;
 					toUpper(temp1);
 					toUpper(temp2);
+
 					if (temp1 > temp2) {
 						word temp = words[j];
 						words[j] = words[j+1];
@@ -154,13 +199,16 @@ void sortArray(constants::sortOrder so) {
 			}
 
 			break;
-		case sortOrder::DESCENDING:
+		}
+		case sortOrder::DESCENDING: {
+
 			for (int i = 0 ; i < arr - 1 ; i++) {
 				for (int j = 0 ; j < arr - i - 1 ; j++) {
 					std::string temp1 = words[j].word;
 					std::string temp2 = words[j+1].word;
 					toUpper(temp1);
 					toUpper(temp2);
+
 					if (temp1 < temp2) {
 						word temp = words[j];
 						words[j] = words[j+1];
@@ -170,7 +218,22 @@ void sortArray(constants::sortOrder so) {
 			}
 
 			break;
-		case sortOrder::NUMBER_OCCURRENCES:
+		}
+		case sortOrder::NUMBER_OCCURRENCES: {
+
+			for (int i = 1; i < arr; i++) {
+				for (int j = 1; j < arr; j++) {
+
+					if (words[j - 1].num_occur < words[j].num_occur) {
+						word temp;
+						temp.word = words[j - 1].word;
+						temp.num_occur = words[j - 1].num_occur;
+						words[j - 1] = words[j];
+						words[j] = temp;
+					}
+				}
+			}
+		}
 			break;
 		case sortOrder::NONE:
 			break;
